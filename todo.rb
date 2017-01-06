@@ -1,3 +1,27 @@
+# Modules
+
+module Menu
+	def menu
+		"Welcome to the Todo List Program!
+		The following menu will help you use the program:
+		1) Add
+		2) Show
+		Q) Quit"
+	end
+
+	def show
+		menu
+	end
+end
+
+module Promptable
+	def prompt(message = 'What would you like to do?', symbol = ':> ')
+		print message
+		print symbol
+		gets.chomp
+	end
+end
+
 # Classes
 
 class List
@@ -25,9 +49,20 @@ end
 # actions
 
 if __FILE__ == $PROGRAM_NAME
+	include Menu
+	include Promptable
 	my_list = List.new
-	puts 'You have created a new list'
-	my_list.add(Task.new('test'))
-	puts 'You have added a task to the Todo List'
-	puts my_list.show
+	puts 'Please choose from the following list.'
+		until ['q'].include?(user_input = prompt(show).downcase)
+			case user_input
+			when '1'
+				my_list.add(Task.new(prompt('What is the task you would like to add?')))
+			when '2'
+				puts my_list.show
+			else
+				puts 'Sorry, I did not understand that.'
+			end
+			prompt('Press enter to continue', '')
+		end
+	puts 'Outro - Thanks for using the Todo List!'
 end
