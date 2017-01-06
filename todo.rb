@@ -9,6 +9,10 @@ class List
 	def add(task)
 		all_tasks << task
 	end
+
+	def show
+		all_tasks
+	end
 end
 
 class Task
@@ -25,4 +29,5 @@ if __FILE__ == $PROGRAM_NAME
 	puts 'You have created a new list'
 	my_list.add(Task.new('test'))
 	puts 'You have added a task to the Todo List'
+	puts my_list.show
 end
