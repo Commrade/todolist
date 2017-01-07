@@ -5,9 +5,10 @@ module Menu
 		"Welcome to the Todo List Program!
 		The following menu will help you use the program:
 		1) Add
-		2) Show
-		3) Write to a File
-		4) Read from a File
+		2) Delete
+		3) Show
+		4) Write to a File
+		5) Read from a File
 		Q) Quit "
 	end
 
@@ -37,7 +38,7 @@ class List
 	end
 
 	def show
-		all_tasks
+		all_tasks.map.with_index { |l, i| "(#{i.next}): #{l}"}
 	end
 
 	def write_to_file(filename)
@@ -48,6 +49,10 @@ class List
 		IO.readlines(filename).each do |line|
 			add(Task.new(line.chomp))
 		end
+	end
+
+	def delete(task_number)
+		all_tasks.delete_at(task_number - 1)
 	end
 end
 
@@ -75,9 +80,12 @@ if __FILE__ == $PROGRAM_NAME
 				my_list.add(Task.new(prompt('What is the task you would like to add?')))
 			when '2'
 				puts my_list.show
+				my_list.delete(prompt('What task would you like to remove?').to_i)
 			when '3'
-				my_list.write_to_file(prompt('What is the filename to write to?'))
+				puts my_list.show
 			when '4'
+				my_list.write_to_file(prompt('What is the filename to write to?'))
+			when '5'
 				begin
 					my_list.read_from_file(prompt('What is the filename to read from?'))
 				rescue Errno::ENOENT
