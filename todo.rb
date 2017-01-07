@@ -5,10 +5,11 @@ module Menu
 		"Welcome to the Todo List Program!
 		The following menu will help you use the program:
 		1) Add
-		2) Delete
-		3) Show
-		4) Write to a File
-		5) Read from a File
+		2) Update
+		3) Delete
+		4) Show
+		5) Write to a File
+		6) Read from a File
 		Q) Quit "
 	end
 
@@ -42,28 +43,51 @@ class List
 	end
 
 	def write_to_file(filename)
-		IO.write(filename, @all_tasks.map(&:to_s).join("\n"))
+		machinified = @all_tasks.map(&:to_machine).join("\n")
+		IO.write(filename, machinified)
 	end
 
 	def read_from_file(filename)
 		IO.readlines(filename).each do |line|
-			add(Task.new(line.chomp))
+			status, *description = line.split(':')
+			status = status.include?('X')
+			add(Task.new(description.join(':').strip, status))
 		end
 	end
 
 	def delete(task_number)
 		all_tasks.delete_at(task_number - 1)
 	end
+
+	def update(task_number, task)
+		all_tasks[task_number - 1] = task
+	end
 end
 
 class Task
 	attr_reader :description
-	def initialize(description)
+	attr_accessor :status
+	def initialize(description, status = false)
 		@description = description
+		@status = false
 	end
 
 	def to_s
 		description
+	end
+
+	def completed?
+		status
+	end
+
+	def to_machine
+		"#{represent_status} : #{description}"
+	end
+
+	private
+
+	def represent_status
+		"#{completed? ? '[X]' : '[ ]'}"
 	end
 end
 
@@ -80,12 +104,15 @@ if __FILE__ == $PROGRAM_NAME
 				my_list.add(Task.new(prompt('What is the task you would like to add?')))
 			when '2'
 				puts my_list.show
-				my_list.delete(prompt('What task would you like to remove?').to_i)
+				my_list.update(prompt('What task would you like to edit?').to_i, Task.new(prompt('Enter new task ')))
 			when '3'
 				puts my_list.show
+				my_list.delete(prompt('What task would you like to remove?').to_i)
 			when '4'
-				my_list.write_to_file(prompt('What is the filename to write to?'))
+				puts my_list.show
 			when '5'
+				my_list.write_to_file(prompt('What is the filename to write to?'))
+			when '6'
 				begin
 					my_list.read_from_file(prompt('What is the filename to read from?'))
 				rescue Errno::ENOENT
